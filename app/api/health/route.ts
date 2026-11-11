@@ -1,7 +1,13 @@
 import { connection, NextResponse } from "next/server";
+import { qaSuiteOn } from "@/lib/server/qa-suite";
 
-/** Liveness only, like any ordinary site. What the site runs with is at /api/environment. */
+/**
+ * Liveness, like any ordinary site. What the site runs with is at /api/environment.
+ * With QA_SUITE=on it also tells the QA console this is a stand-in for the
+ * full suite, and where its sign-in page is.
+ */
 export async function GET() {
   await connection(); // evaluate per request, never prerender
-  return NextResponse.json({ ok: true }, { headers: { "cache-control": "no-store" } });
+  const body = qaSuiteOn() ? { ok: true, standIn: true, signInPath: "/login" } : { ok: true };
+  return NextResponse.json(body, { headers: { "cache-control": "no-store" } });
 }

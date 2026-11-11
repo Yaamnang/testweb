@@ -29,8 +29,8 @@ export async function GET(req: NextRequest) {
   const pending = await pendingUser(req);
   if (!pending) return jsonError(401, "This setup link has expired. Please sign in again.");
   const { user } = pending;
-  const label = encodeURIComponent(`Eclypse:${user.email}`);
-  const otpauthUri = `otpauth://totp/${label}?secret=${user.totpSecret}&issuer=Eclypse&algorithm=SHA1&digits=6&period=30`;
+  const label = encodeURIComponent(`Demo Platform:${user.email}`);
+  const otpauthUri = `otpauth://totp/${label}?secret=${user.totpSecret}&issuer=${encodeURIComponent("Demo Platform")}&algorithm=SHA1&digits=6&period=30`;
   const qrSvg = await QRCode.toString(otpauthUri, { type: "svg", margin: 0, errorCorrectionLevel: "M" });
   return NextResponse.json({ email: user.email, secret: user.totpSecret, otpauthUri, qrSvg });
 }

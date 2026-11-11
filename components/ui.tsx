@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
 import { AlertIcon, CheckCircleIcon, InfoIcon, Spinner } from "./icons";
 
@@ -209,20 +208,16 @@ export function LoadingScreen({ label = "Loading…" }: { label?: string }) {
 }
 
 /**
- * Eclypse AI logo, from eclypse-ai.com.
+ * Text logo for the demo platform.
  * tone="dark": dark letters, for white backgrounds (default).
  * tone="light": white letters, for dark backgrounds.
  */
 export function Wordmark({ className = "", tone = "dark" }: { className?: string; tone?: "dark" | "light" }) {
   return (
-    <Image
-      src={tone === "light" ? "/brand/eclypse-wordmark-white.svg" : "/brand/eclypse-wordmark-dark.svg"}
-      alt="Eclypse AI"
-      width={381}
-      height={127}
-      loading="eager"
-      className={`block h-12 w-auto ${className}`}
-    />
+    <span className={`flex w-fit items-center gap-2 text-lg font-semibold tracking-tight ${tone === "light" ? "text-white" : "text-ink-900"} ${className}`}>
+      <span aria-hidden className="flex size-7 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">D</span>
+      Demo Platform
+    </span>
   );
 }
 

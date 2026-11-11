@@ -83,18 +83,18 @@ export function LoginForm({ initialCaptcha }: { initialCaptcha: CaptchaChallenge
 
   return (
     <AuthLayout
-      title="Sign in to Eclypse"
-      subtitle={step === "password" ? "For Eclypse staff. Use your work email and password." : "Enter the 6-digit code from your authenticator app."}
+      title="Sign in"
+      subtitle={step === "password" ? "Use your email and password." : "Enter the 6-digit code from your authenticator app."}
       footer={step === "password" && (
-        <>New to the team? <Link href="/signup" className="font-medium text-brand-600 hover:text-brand-700">Create your account</Link></>
+        <>Don&apos;t have an account? <Link href="/signup" className="font-medium text-brand-600 hover:text-brand-700">Create your account</Link></>
       )}
     >
       {error && <Notice kind="error" className="mb-5">{error}</Notice>}
 
       {step === "password" ? (
         <form onSubmit={submitPassword} className="space-y-5">
-          <Field id="email" label="Work email" type="email" autoComplete="username" required autoFocus
-            placeholder="you@eclypse-ai.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Field id="email" label="Email" type="email" autoComplete="username" required autoFocus
+            placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
           <PasswordField id="password" label="Password" autoComplete="current-password" required
             placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
           {captcha && <CaptchaField challenge={captcha} value={captchaAnswer} onChange={setCaptchaAnswer} error={captchaError} />}
@@ -107,7 +107,7 @@ export function LoginForm({ initialCaptcha }: { initialCaptcha: CaptchaChallenge
               <SmartphoneIcon className="size-5" />
             </span>
             <p className="text-sm text-ink-600">
-              Open your authenticator app and find <span className="font-medium text-ink-900">Eclypse</span>. Codes change every 30 seconds.
+              Open your authenticator app and find <span className="font-medium text-ink-900">Demo Platform</span>. Codes change every 30 seconds.
             </p>
           </div>
           <div>

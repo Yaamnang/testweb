@@ -6,6 +6,7 @@ import { bug } from "./bugs";
 import type { CsvTable } from "./csv";
 import { checkPassword, hashPassword } from "./password";
 import { randomBase32Secret } from "./totp";
+import { qaLoginsFromEnv, seedMemory } from "./seed";
 
 export { checkPassword, hashPassword };
 
@@ -67,7 +68,7 @@ export type JobRecord = {
   error: string | null;
 };
 
-type Db = {
+export type MemDb = {
   tenants: Map<string, Tenant>;
   users: Map<string, User>;
   memberships: Membership[];
@@ -77,17 +78,16 @@ type Db = {
   documents: Map<string, DocumentRecord>;
   jobs: Map<string, JobRecord>;
 };
+type Db = MemDb;
 
 // ---------------------------------------------------------------------------
-// Seed data. Everything here is fictional.
+// Seed data: the fictional tenants, users and documents in seed.ts, shared
+// with the Supabase seed and the /setup page. The QA bot and viewer are only
+// created when their credentials come from the environment (SEED_QA_*).
 // ---------------------------------------------------------------------------
 
 export const QA_TENANT_SLUG = "qa-synthetic";
 export const CANARY_DOC_ID = "doc_qacanary_0001";
-
-function table(rows: string[][]): CsvTable {
-  return { header: ["subject_id", "arm", "age", "adverse_event", "severity"], rows };
-}
 
 function seed(): Db {
   const fresh: Db = {
@@ -100,79 +100,7 @@ function seed(): Db {
     documents: new Map(),
     jobs: new Map(),
   };
-
-  const tenants: Tenant[] = [
-    { id: "t_acme", slug: "acme-pharma", name: "Acme Pharma" },
-    { id: "t_northwind", slug: "northwind-health", name: "Northwind Health" },
-    { id: "t_qa", slug: QA_TENANT_SLUG, name: "QA Synthetic" },
-    { id: "t_qa_canary", slug: "qa-canary", name: "QA Canary" },
-  ];
-  for (const t of tenants) fresh.tenants.set(t.id, t);
-
-  // Client users exist so their data exists; their credentials are random and
-  // never leave the process. The QA bot has no way to sign in as them.
-  const addUser = (tenantId: string, email: string, password: string, totpSecret: string, role: Role = "admin") => {
-    const u: User = {
-      id: `u_${randomUUID().slice(0, 8)}`,
-      email,
-      passwordHash: hashPassword(password),
-      totpSecret,
-      totpConfirmed: true,
-      lastTotpStep: -1,
-      displayName: email.split("@")[0],
-      notificationEmail: email,
-    };
-    fresh.users.set(u.id, u);
-    fresh.memberships.push({ userId: u.id, tenantId, role });
-    return u;
-  };
-
-  const acmeUser = addUser("t_acme", "j.doe@acme-pharma.example", randomUUID(), randomBase32Secret());
-  const nwUser = addUser("t_northwind", "r.lee@northwind-health.example", randomUUID(), randomBase32Secret());
-  const canaryUser = addUser("t_qa_canary", "qa-canary@synthetic.eclypse.test", randomUUID(), randomBase32Secret());
-
-  // The QA bot is only created when its credentials are supplied through the
-  // environment (from a secret store in CI). No default credentials exist.
-  const qaPassword = process.env.SEED_QA_PASSWORD;
-  const qaTotp = process.env.SEED_QA_TOTP_SECRET;
-  if (qaPassword && qaTotp) {
-    const qa = addUser("t_qa", process.env.SEED_QA_EMAIL ?? "qa-bot@synthetic.eclypse.test", qaPassword, qaTotp);
-    qa.displayName = "QA Bot";
-  }
-  // Second QA account, a read-only Viewer in the same QA org, to test roles.
-  const viewerPassword = process.env.SEED_QA_VIEWER_PASSWORD;
-  const viewerTotp = process.env.SEED_QA_VIEWER_TOTP_SECRET;
-  if (viewerPassword && viewerTotp) {
-    const email = process.env.SEED_QA_VIEWER_EMAIL ?? "qa-viewer@synthetic.eclypse.test";
-    const viewer = addUser("t_qa", email, viewerPassword, viewerTotp, "viewer");
-    viewer.displayName = "QA Viewer";
-  }
-
-  const addDoc = (id: string, tenantId: string, name: string, uploadedBy: string, rows: string[][]) => {
-    fresh.documents.set(id, {
-      id,
-      tenantId,
-      name,
-      sizeBytes: rows.length * 40,
-      table: table(rows),
-      uploadedAt: Date.UTC(2026, 9, 1, 9, 0, 0),
-      uploadedBy,
-    });
-  };
-
-  addDoc("doc_acme_0001", "t_acme", "PH2-ONC-114 interim AE listing.csv", acmeUser.id, [
-    ["ONC-001", "treatment", "61", "neutropenia", "severe"],
-    ["ONC-002", "placebo", "58", "fatigue", "mild"],
-  ]);
-  addDoc("doc_nw_0001", "t_northwind", "NW-CARD-07 safety listing.csv", nwUser.id, [
-    ["CARD-01", "treatment", "70", "dizziness", "moderate"],
-  ]);
-  // Canary: lives in a second synthetic tenant that the QA team owns. If the
-  // QA bot can ever see this marker, tenant isolation is broken.
-  addDoc(CANARY_DOC_ID, "t_qa_canary", "QA-CANARY-7f3a2c do-not-display.csv", canaryUser.id, [
-    ["QA-CANARY-7f3a2c", "placebo", "40", "canary", "mild"],
-  ]);
-
+  seedMemory(fresh, qaLoginsFromEnv());
   return fresh;
 }
 

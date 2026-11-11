@@ -1,6 +1,7 @@
 import "server-only";
 import { createHmac } from "node:crypto";
 import { sameText, sign, signingKey } from "./signing";
+import { qaSuiteOn } from "./qa-suite";
 
 /**
  * Email code step for sign-up. EMAIL_CODE picks the mode:
@@ -21,7 +22,9 @@ export const PENDING_SIGNUP_TTL_MS = 20 * 60_000;
 
 export type EmailCodeMode = "off" | "demo" | "supabase";
 
+/** Always off when QA_SUITE=on. */
 export function emailCodeMode(): EmailCodeMode {
+  if (qaSuiteOn()) return "off";
   const value = (process.env.EMAIL_CODE ?? "").trim().toLowerCase();
   if (value === "demo") return "demo";
   if (value === "supabase" || value === "on") return "supabase";

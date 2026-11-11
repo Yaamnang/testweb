@@ -1,6 +1,7 @@
 import "server-only";
 import { randomBytes, randomInt } from "node:crypto";
 import { sameText, sign, signingKey } from "./signing";
+import { qaSuiteOn } from "./qa-suite";
 
 /**
  * A simple built-in CAPTCHA, switched on with CAPTCHA=on.
@@ -21,8 +22,9 @@ export const CAPTCHA_WRONG = "That did not match, or it expired. Type the new ch
 
 export type CaptchaChallenge = { svg: string; token: string };
 
+/** Off whenever QA_SUITE=on, whatever CAPTCHA says. */
 export function captchaEnabled(): boolean {
-  return process.env.CAPTCHA === "on";
+  return process.env.CAPTCHA === "on" && !qaSuiteOn();
 }
 
 export function newCaptcha(now = Date.now(), key = signingKey()): CaptchaChallenge {

@@ -11,7 +11,7 @@ test.describe("Sign-in", { tag: ["@auth", "@live-safe"] }, () => {
   test("signed-out visitors are sent to the sign-in page", async ({ page }) => {
     await page.goto("/workspace");
     await expect(page, "Opening the workspace while signed out should redirect to sign-in").toHaveURL(/\/login$/);
-    await expect(page.getByRole("heading", { name: "Sign in to Eclypse" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
   });
 
   test("a wrong password is refused with a clear message", async ({ page }) => {

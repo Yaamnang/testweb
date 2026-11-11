@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Eclypse Platform (stand-in)",
+  title: "Demo Platform",
   description: "Stand-in AI platform used to demonstrate automated frontend QA.",
 };
 

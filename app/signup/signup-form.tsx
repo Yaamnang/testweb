@@ -156,8 +156,8 @@ export function SignupForm({ initialCaptcha }: { initialCaptcha: CaptchaChalleng
 
   return (
     <AuthLayout
-      title="Create your staff account"
-      subtitle="For Eclypse employees. It takes about a minute, and you will need an authenticator app on your phone."
+      title="Create your account"
+      subtitle="It takes about a minute, and you will need an authenticator app on your phone."
       footer={<>Already have an account? <Link href="/login" className="font-medium text-brand-600 hover:text-brand-700">Sign in</Link></>}
     >
       {error && <Notice kind="error" className="mb-5">{error}</Notice>}
@@ -200,7 +200,7 @@ export function SignupForm({ initialCaptcha }: { initialCaptcha: CaptchaChalleng
       ) : (
       <form onSubmit={submit} noValidate className="space-y-5">
         <Field id="displayName" label="Full name" autoComplete="name" autoFocus placeholder="Jane Doe" {...bind("displayName")} />
-        <Field id="email" label="Work email" type="email" autoComplete="email" placeholder="you@eclypse-ai.com" {...bind("email")} />
+        <Field id="email" label="Email" type="email" autoComplete="email" placeholder="you@example.com" {...bind("email")} />
         <div>
           <PasswordField id="password" label="Password" autoComplete="new-password" placeholder="Create a password"
             revealed={showPassword} onRevealedChange={setShowPassword}
