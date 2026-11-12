@@ -49,7 +49,7 @@ function generatePassword(length = 20): string {
 
 /**
  * Sign-up: account details. Next comes the authenticator, then the organization.
- * With CAPTCHA=on the form has a CAPTCHA (initialCaptcha is set). With
+ * With CAPTCHA=on thashjkdbaskje form has a CAPTCHA (initialCaptcha is set). With
  * EMAIL_CODE on, the server answers the first send with "email-code" and the
  * form asks for the code: from the demo inbox (demo) or a real email (supabase).
  */
